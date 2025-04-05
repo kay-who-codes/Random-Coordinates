@@ -158,6 +158,7 @@
                 <label for="continent">Select a Continent:</label>
                 <select id="continent">
                     <option value="">-- Choose a Continent --</option>
+                    <option value="global">Global</option>
                     <option value="africa">Africa</option>
                     <option value="antarctica">Antarctica</option>
                     <option value="asia">Asia</option>
@@ -192,16 +193,17 @@
             const mapLink = document.getElementById('map-link');
             const continentInfo = document.getElementById('continent-info');
             
-            // Continent boundary definitions (latitude and longitude ranges)
-            const continentBoundaries = {
-                'africa': { minLat: -35, maxLat: 37, minLng: -18, maxLng: 55 },
-                'antarctica': { minLat: -90, maxLat: -60, minLng: -180, maxLng: 180 },
-                'asia': { minLat: 10, maxLat: 55, minLng: 30, maxLng: 150 },
-                'europe': { minLat: 35, maxLat: 70, minLng: -10, maxLng: 60 },
-                'north-america': { minLat: 15, maxLat: 72, minLng: -170, maxLng: -55 },
-                'south-america': { minLat: -55, maxLat: 12, minLng: -85, maxLng: -30 },
-                'australia': { minLat: -45, maxLat: -10, minLng: 110, maxLng: 155 }
-            };
+// Continent boundary definitions (latitude and longitude ranges)
+const continentBoundaries = {
+    'global': { minLat: -90, maxLat: 90, minLng: -180, maxLng: 180 }, // Entire world
+    'africa': { minLat: -35, maxLat: 37, minLng: -18, maxLng: 55 },
+    'antarctica': { minLat: -90, maxLat: -60, minLng: -180, maxLng: 180 },
+    'asia': { minLat: 10, maxLat: 55, minLng: 30, maxLng: 150 },
+    'europe': { minLat: 35, maxLat: 70, minLng: -10, maxLng: 60 },
+    'north-america': { minLat: 15, maxLat: 72, minLng: -170, maxLng: -55 },
+    'south-america': { minLat: -55, maxLat: 12, minLng: -85, maxLng: -30 },
+    'australia': { minLat: -45, maxLat: -10, minLng: 110, maxLng: 155 }
+};
             
             // Continent facts
             const continentFacts = {

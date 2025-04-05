@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Continent Coordinate Generator</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --primary-light: #a29bfe;
+            --secondary: #00b894;
+            --text: #f5f6fa;
+            --bg: #1e272e;
+            --card-bg: #2d3436;
+            --border: #3d484d;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        
+        h1 {
+            color: var(--primary-light);
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+        
+        .select-container {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--primary-light);
+        }
+        
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 5px;
+            border: 1px solid var(--border);
+            background-color: var(--bg);
+            color: var(--text);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        button:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(0, 184, 148, 0.1);
+            border-left: 4px solid var(--secondary);
+            border-radius: 0 5px 5px 0;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        .coordinates {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 10px 0;
+        }
+        
+        .map-link {
+            color: var(--primary-light);
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        
+        .map-link:hover {
+            color: var(--primary);
+            text-decoration: underline;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .continent-info {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #b2bec3;
+        }
+        
+        footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 20px;
+            color: #636e72;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 Continent Coordinate Generator</h1>
+        
+        <div class="card">
+            <div class="select-container">
+                <label for="continent">Select a Continent:</label>
+                <select id="continent">
+                    <option value="">-- Choose a Continent --</option>
+                    <option value="africa">Africa</option>
+                    <option value="antarctica">Antarctica</option>
+                    <option value="asia">Asia</option>
+                    <option value="europe">Europe</option>
+                    <option value="north-america">North America</option>
+                    <option value="south-america">South America</option>
+                    <option value="australia">Australia</option>
+                </select>
+            </div>
+            
+            <button id="generate-btn">Generate Random Coordinates</button>
+            
+            <div class="result" id="result">
+                <h3>Random Location:</h3>
+                <div class="coordinates" id="coordinates"></div>
+                <a href="#" target="_blank" class="map-link" id="map-link">View on Google Maps</a>
+                <div class="continent-info" id="continent-info"></div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        Made with ♥ for explorers and developers
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const continentSelect = document.getElementById('continent');
+            const generateBtn = document.getElementById('generate-btn');
+            const resultDiv = document.getElementById('result');
+            const coordinatesDiv = document.getElementById('coordinates');
+            const mapLink = document.getElementById('map-link');
+            const continentInfo = document.getElementById('continent-info');
+            
+            // Continent boundary definitions (latitude and longitude ranges)
+            const continentBoundaries = {
+                'africa': { minLat: -35, maxLat: 37, minLng: -18, maxLng: 55 },
+                'antarctica': { minLat: -90, maxLat: -60, minLng: -180, maxLng: 180 },
+                'asia': { minLat: 10, maxLat: 55, minLng: 30, maxLng: 150 },
+                'europe': { minLat: 35, maxLat: 70, minLng: -10, maxLng: 60 },
+                'north-america': { minLat: 15, maxLat: 72, minLng: -170, maxLng: -55 },
+                'south-america': { minLat: -55, maxLat: 12, minLng: -85, maxLng: -30 },
+                'australia': { minLat: -45, maxLat: -10, minLng: 110, maxLng: 155 }
+            };
+            
+            // Continent facts
+            const continentFacts = {
+                'africa': "Africa is the world's second-largest continent, home to 54 countries and the Sahara, the largest hot desert.",
+                'antarctica': "Antarctica is Earth's southernmost continent, containing the geographic South Pole. It's the coldest, driest, and windiest continent.",
+                'asia': "Asia is Earth's largest and most populous continent, located primarily in the Eastern and Northern Hemispheres.",
+                'europe': "Europe is a continent located entirely in the Northern Hemisphere and mostly in the Eastern Hemisphere.",
+                'north-america': "North America is the third-largest continent by area, spanning from the Arctic Ocean to the Isthmus of Panama.",
+                'south-america': "South America is a continent mostly in the Southern Hemisphere, home to the Amazon rainforest and Andes mountains.",
+                'australia': "Australia is the smallest continent and the largest country in Oceania, known for its unique wildlife and the Outback."
+            };
+            
+            generateBtn.addEventListener('click', function() {
+                const selectedContinent = continentSelect.value;
+                
+                if (!selectedContinent) {
+                    alert('Please select a continent first!');
+                    return;
+                }
+                
+                const boundaries = continentBoundaries[selectedContinent];
+                const randomLat = (Math.random() * (boundaries.maxLat - boundaries.minLat) + boundaries.minLat).toFixed(6);
+                const randomLng = (Math.random() * (boundaries.maxLng - boundaries.minLng) + boundaries.minLng).toFixed(6);
+                
+                coordinatesDiv.textContent = `${randomLat}, ${randomLng}`;
+                mapLink.href = `https://www.google.com/maps?q=${randomLat},${randomLng}`;
+                continentInfo.textContent = continentFacts[selectedContinent];
+                
+                resultDiv.classList.add('show');
+            });
+        });
+    </script>
+</body>
+</html>
